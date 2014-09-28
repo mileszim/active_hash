@@ -1,3 +1,5 @@
+require 'ostruct'
+
 module ActiveHash
 
   class RecordNotFound < StandardError
@@ -92,6 +94,13 @@ module ActiveHash
 
         add_to_record_index({ record.id.to_s => @records.length })
         @records << record
+      end
+      
+      def update(record, params = {})
+        validate_unique_id(OpenStruct.new(record.attributes.merge(params))) if dirty
+        mark_dirty
+        record.attributes.merge!(params)
+        record
       end
       
       def delete(record)
@@ -488,8 +497,7 @@ module ActiveHash
     end
     
     def update(params = {})
-      self.attributes.merge!(params)
-      self
+      self.class.update(self, params)
     end
 
     def save(*args)
