@@ -67,7 +67,7 @@ module ActiveHash
 
       def data=(array_of_hashes)
         mark_dirty
-        @records = nil
+        @records = []
         reset_record_index
         self._data = array_of_hashes
         if array_of_hashes
