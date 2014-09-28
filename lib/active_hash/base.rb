@@ -97,7 +97,7 @@ module ActiveHash
       end
       
       def update(record, params = {})
-        validate_unique_id(OpenStruct.new(record.attributes.merge(params))) if dirty
+        validate_unique_id(OpenStruct.new(params)) if params[:id] && dirty
         mark_dirty
         record.attributes.merge!(params)
         record
