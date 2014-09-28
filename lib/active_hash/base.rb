@@ -93,6 +93,13 @@ module ActiveHash
         add_to_record_index({ record.id.to_s => @records.length })
         @records << record
       end
+      
+      def delete(record)
+        validate_id_exists(record)
+        mark_dirty
+        remove_from_record_index(record)
+        @records.delete(record)
+      end
 
       def next_id
         max_record = all.max { |a, b| a.id <=> b.id }
@@ -120,12 +127,24 @@ module ActiveHash
       end
 
       private :add_to_record_index
+      
+      def remove_from_record_index(record)
+        record_index.delete(record.id.to_s)
+      end
+      
+      private :remove_from_record_index
 
       def validate_unique_id(record)
         raise IdError.new("Duplicate ID found for record #{record.attributes.inspect}") if record_index.has_key?(record.id.to_s)
       end
 
       private :validate_unique_id
+      
+      def validate_id_exists(record)
+        raise IdError.new("ID not found for record #{record.attributes.inspect}") unless record_index.has_key?(record.id.to_s)
+      end
+      
+      private :validate_id_exists
 
       def create(attributes = {})
         record = new(attributes)
@@ -472,6 +491,11 @@ module ActiveHash
     end
 
     alias save! save
+    
+    def destroy
+      self.class.delete(self)
+      true
+    end
 
     def valid?
       true
