@@ -179,6 +179,10 @@ module ActiveHash
       def count
         all.length
       end
+      
+      def maximum(param = :id)
+        all.max_by{|r| r.try(param) }.try(param)
+      end
 
       def transaction
         yield
@@ -481,6 +485,11 @@ module ActiveHash
       end
 
       obj
+    end
+    
+    def update(params = {})
+      self.attributes.merge!(params)
+      self
     end
 
     def save(*args)
